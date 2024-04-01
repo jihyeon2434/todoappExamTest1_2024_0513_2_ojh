@@ -4,11 +4,9 @@ import Button from '@mui/material/Button';
 export default function Home() {
   return (
     <>
-      <div>
-        <Button className="bg-red-500" variant="text">
-          Text
-        </Button>
-      </div>
+      <Button className="tw-bg-red-500" variant="contained">
+        Contained
+      </Button>
     </>
   );
 }
