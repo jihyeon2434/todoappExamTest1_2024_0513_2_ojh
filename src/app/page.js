@@ -19,6 +19,8 @@ import {
   Divider,
   ListItemButton,
   Modal,
+  Snackbar,
+  Alert,
 } from '@mui/material';
 import { FaBars, FaCheck, FaEllipsisH, FaTrash } from 'react-icons/fa';
 import { FaPenToSquare } from 'react-icons/fa6';
@@ -329,8 +331,54 @@ const TodoList = ({ todosState }) => {
   );
 };
 
+function NoticeSnackbar({ status }) {
+  return (
+    <>
+      <Snackbar
+        open={status.opened}
+        autoHideDuration={status.autoHideDuration}
+        onClose={status.close}>
+        <Alert variant={status.variant} severity={status.severity}>
+          {status.msg}
+        </Alert>
+      </Snackbar>
+    </>
+  );
+}
+
+function useNoticeSnackbarStatus() {
+  const [opened, setOpened] = React.useState(false);
+  const [autoHideDuration, setAutoHideDuration] = React.useState(null);
+  const [variant, setVariant] = React.useState(null);
+  const [severity, setSeverity] = React.useState(null);
+  const [msg, setMsg] = React.useState(null);
+
+  const open = (msg, severity = 'success', autoHideDuration = 1000, variant = 'filled') => {
+    setOpened(true);
+    setMsg(msg);
+    setSeverity(severity);
+    setAutoHideDuration(autoHideDuration);
+    setVariant(variant);
+  };
+
+  const close = () => {
+    setOpened(false);
+  };
+
+  return {
+    opened,
+    open,
+    close,
+    autoHideDuration,
+    variant,
+    severity,
+    msg,
+  };
+}
+
 function App() {
   const todosState = useTodosStatus();
+  const noticeSnackbarState = useNoticeSnackbarStatus();
 
   React.useEffect(() => {
     todosState.addTodo('스쿼트\n런지');
@@ -340,7 +388,7 @@ function App() {
 
   return (
     <>
-      <AppBar position="fixed">
+      <AppBar position="fixed" onClick={() => noticeSnackbarState.open('abc')}>
         <Toolbar>
           <div className="tw-flex-1">
             <FaBars onClick={() => setOpen(true)} className="tw-cursor-pointer" />
@@ -356,6 +404,7 @@ function App() {
         </Toolbar>
       </AppBar>
       <Toolbar />
+      <NoticeSnackbar status={noticeSnackbarState} />
       <NewTodoForm todosState={todosState} />
       <TodoList todosState={todosState} />
     </>
