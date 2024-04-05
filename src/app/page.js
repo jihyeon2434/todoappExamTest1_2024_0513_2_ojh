@@ -45,9 +45,28 @@ function useTodosStatus() {
     setTodos(newTodos);
   };
 
+  // modify v1
   const modifyTodo = (id, content) => {
     const newTodos = todos.map((todo) => (todo.id != id ? todo : { ...todo, content }));
     setTodos(newTodos);
+  };
+
+  // modify v2
+  const modifyTodoByIndex = (index, newContent) => {
+    const newTodos = todos.map((todo, _index) =>
+      _index != index ? todo : { ...todo, content: newContent },
+    );
+    setTodos(newTodos);
+  };
+  // modify v2
+  const modifyTodoById = (id, newContent) => {
+    const index = findTodoIndexById(id);
+
+    if (index == -1) {
+      return null;
+    }
+
+    modifyTodoByIndex(index, newContent);
   };
 
   const findTodoIndexById = (id) => {
@@ -70,6 +89,7 @@ function useTodosStatus() {
     removeTodo,
     modifyTodo,
     findTodoById,
+    modifyTodoById,
   };
 }
 
@@ -206,9 +226,12 @@ function EditTodoModal({ status, todosState, todo }) {
       return;
     }
 
-    // todosState.addTodo(form.content.value);
-    // form.content.value = '';
-    // form.content.focus();
+    // modify v1
+    todosState.modifyTodo(todo.id, form.content.value);
+    status.close();
+
+    // modify v2
+    // todosState.modifyTodoById(todo.id, form.content.value);
   };
 
   return (
@@ -240,6 +263,16 @@ function EditTodoModal({ status, todosState, todo }) {
 }
 
 function TodoOptionDrawer({ status, todosState }) {
+  const removeTodo = () => {
+    if (confirm(`${status.todoId}번 할 일을 삭제하시겠습니까?`) == false) {
+      status.close();
+      return;
+    }
+
+    todosState.removeTodo(status.todoId);
+    status.close();
+  };
+
   const editTodoModalStatus = useEditTodoModalStatus();
 
   const todo = todosState.findTodoById(status.todoId);
@@ -260,7 +293,9 @@ function TodoOptionDrawer({ status, todosState }) {
             <span>수정</span>
             <FaPenToSquare className="block tw-mt-[-5px]" />
           </ListItemButton>
-          <ListItemButton className="tw-p-[15px_20px] tw-flex tw-gap-2 tw-items-center">
+          <ListItemButton
+            className="tw-p-[15px_20px] tw-flex tw-gap-2 tw-items-center"
+            onClick={removeTodo}>
             <span>삭제</span>
             <FaTrash className="block tw-mt-[-5px]" />
           </ListItemButton>
